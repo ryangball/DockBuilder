@@ -43,13 +43,33 @@ Some things to keep in mind:
 3. Within the defaultItemsToAdd array, you need to follow the same pattern that I used in the example. When specifying view options for the persistent-others Dock items, you need to separate the Dock item and options with a comma (",") as per the example.
 4. After modifying the variables in build.sh, please test for full functionality before deploying.
 
+## Testing
+To test DockBuilder, install the .pkg, then unload/load/start the LaunchAgent.
+```bash
+# Delete the breadcrumb for the user if it exists
+find ~/Library/Preferences -name com.github.ryangball.dockbuilder.breadcrumb.plist -delete
+
+# Unload the LaunchAgent
+launchctl unload /Library/LaunchAgents/com.github.ryangball.dockbuilder.plist
+
+# Load the LaunchAgent
+launchctl load /Library/LaunchAgents/com.github.ryangball.dockbuilder.plist
+
+# Start the LaunchAgent (if necessary)
+launchctl start com.github.ryangball.dockbuilder
+
+# Tail the log to see what is occurring
+tail -f ~/Library/Logs/DockBuilder.log
+```
+
 ## Re-create a User's Dock
 Upon DockBuilder's execution, a breadcrumb is placed into the user's home folder by default: ~/Library/Preferences/com.github.ryangball.dockbuilder.breadcrumb.plist
 
 In the event that this breadcrumb exists for a user, DockBuilder will exit without any action. To re-create a user's Dock, open terminal as the user and run the following to remove the breadcrumb:
-```
+```bash
 rm ~/Library/Preferences/com.github.ryangball.dockbuilder.breadcrumb.plist
 ```
+Then you can simply run the /Applications/Utilities/DockBuilder.app or unload/load the LaunchAgent as per the [Testing](https://github.com/ryangball/DockBuilder#Testing) section above.
 
 ## Dockutil
 [Dockutil](https://github.com/kcrawford/dockutil) is included in the resulting .pkg and is licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) license. Dockutil is automatically downloaded from the releases section when using the build.sh script, or included if you download one of the DockBuilder Releases.

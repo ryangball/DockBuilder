@@ -8,6 +8,11 @@ DockBuilder allows for the building of a user's Dock based on an organization's 
 - Logs to ~/Library/Logs/DockBuilder.log (by default)
 - Does not start until the Dock.app is loaded upon login
 - Only builds a Dock for user's who's Dock is younger than 300 seconds (to minimize re-building a pre-existing user's Dock after the installation of DockBuilder)
+- Option to hide the Dock and display a message to the user while the Dock is being built
+
+<p align="center">
+    <img alt="DockBuilder Message" width="478" src="images/dock_message.png">
+</p>
 
 ## Requirements for Building
 - [Platypus](https://sveinbjorn.org/platypus): A developer tool that creates native Mac applications from command line scripts such as shell scripts or Python, Perl, Ruby, Tcl, JavaScript and PHP programs.

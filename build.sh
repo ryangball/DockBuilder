@@ -142,9 +142,7 @@ echo "Building the .app with Platypus..."
     'dockbuilder.sh' \
     "/private/tmp/DockBuilder/files/Applications/Utilities/DockBuilder.app"
 
-# Migrate preinstall and postinstall scripts to temp build directory
-cp "$PWD/preinstall.sh" /private/tmp/DockBuilder/scripts/preinstall
-chmod +x /private/tmp/DockBuilder/scripts/preinstall
+# Migrate postinstall script to temp build directory
 cp "$PWD/postinstall.sh" /private/tmp/DockBuilder/scripts/postinstall
 chmod +x /private/tmp/DockBuilder/scripts/postinstall
 

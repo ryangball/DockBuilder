@@ -16,7 +16,13 @@ scriptName=$(basename "$0")
 
 # Validate we got values from the plist
 if [[ -f "$preferenceFileFullPath" ]]; then
-	if [[ -z "$breadcrumb" ]] || [[ -z "$log" ]] || [[ -z "$appIcon" ]] || [[ -z "$hideDockWhileBuilding" ]] || [[ -z "$hideDockMessage" ]] || [[ -z "$dockItemsFromPlist" ]]; then
+	# Create array of all items we need to add
+	while read -r line; do
+		itemsToAdd+=("$line")
+	done <<< "$dockItemsFromPlist"
+
+	# Verify that we obtained values for each variable
+	if [[ -z "$breadcrumb" ]] || [[ -z "$log" ]] || [[ -z "$appIcon" ]] || [[ -z "$hideDockWhileBuilding" ]] || [[ -z "$hideDockMessage" ]] || [[ -z "${itemsToAdd[*]}" ]]; then
 		writelog "One or more default settings not present in main preference file; exiting."
 		finish 1
 	fi
@@ -57,28 +63,6 @@ function create_breadcrumb () {
 	/usr/bin/defaults write "$breadcrumb" build-time "$(date +%r)"
 }
 
-function office_icons () {
-	wordversion=$(defaults read "/Applications/Microsoft Word.app/Contents/Info.plist" CFBundleShortVersionString | awk -F. '{print $1}')
-	# Checking for Word/Office 2016
-	/bin/sleep 2
-	if [[ $wordversion -ge "15" ]]; then
-		writelog "Adding Office 2016 apps."
-		itemsToAdd+=("/Applications/Microsoft Word.app")
-		itemsToAdd+=("/Applications/Microsoft Excel.app")
-		itemsToAdd+=("/Applications/Microsoft PowerPoint.app")
-		itemsToAdd+=("/Applications/Microsoft Outlook.app")
-	else
-		# Checking for Office 2011
-		if [ -d "/Applications/Microsoft Office 2011/" ]; then
-			writelog "Adding Office 2011 apps."
-			itemsToAdd+=("/Applications/Microsoft Office 2011/Microsoft Word.app")
-			itemsToAdd+=("/Applications/Microsoft Office 2011/Microsoft Excel.app")
-			itemsToAdd+=("/Applications/Microsoft Office 2011/Microsoft PowerPoint.app")
-			itemsToAdd+=("/Applications/Microsoft Office 2011/Microsoft Outlook.app")
-		fi
-	fi
-}
-
 writelog " "
 writelog "======== Starting $scriptName ========"
 
@@ -99,25 +83,13 @@ if [[ -f "$breadcrumb" ]]; then
 	finish 0
 fi
 
-# Get our list of items to add to the Dock
-while read -r line; do
-	itemsToAdd+=("$line")
-done <<< "$dockItemsFromPlist"
-
-if [[ ! -f "$preferenceFileFullPath" ]]; then
-	writelog "Preference file does not exist; exiting."
-	finish 1
-elif [[ -z "${itemsToAdd[*]}" ]]; then
-	writelog "No items to add in Preference file; exiting."
-	finish 1
-fi
-
 if [[ "$hideDockWhileBuilding" == "true" ]]; then
-	# Display a dialog box to user informing them that we are configuring their Dock (in background)
+	# Display a jamfHelper dialog box to user informing them that we are configuring their Dock (in background)
+	writelog "Unloading the Dock."
 	/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper -windowType utility -title "DockBuilder" -icon "$appIcon" -description "$hideDockMessage" &
 	jamfHelperPID=$!
 
-	# Hide the Dock while it is being updated
+	# Unload the Dock while it is being updated
 	launchctl unload /System/Library/LaunchAgents/com.apple.Dock.plist
 fi
 
@@ -129,12 +101,14 @@ writelog "Clearing Dock."
 modify_dock
 create_breadcrumb
 
-# Reset the Dock and kill the jamfHelper dialog box
-writelog "Resetting Dock."
+# Load the Dock if unloaded or restart the Dock
 if [[ "$hideDockWhileBuilding" == "true" ]]; then
+	writelog "Loading the newly built Dock."
 	launchctl load /System/Library/LaunchAgents/com.apple.Dock.plist
 	launchctl start com.apple.Dock.agent
+else
+	writelog "Resetting Dock."
+	/usr/bin/killall Dock
 fi
-/usr/bin/killall Dock
 
 finish 0

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AppIcon</key>
+	<string>/System/Library/CoreServices/Dock.app/Contents/Resources/Dock.icns</string>
+	<key>BreadcrumbPath</key>
+	<string>$HOME/Library/Preferences/com.github.ryangball.dockbuilder.breadcrumb.plist</string>
+	<key>HideDockMessage</key>
+	<string>Your Mac's Dock is being built for the first time.</string>
+	<key>HideDockWhileBuilding</key>
+	<true/>
+	<key>ItemsToAdd</key>
+	<array>
+		<string>/Applications/System Preferences.app/</string>
+		<string>/Applications/Self Service.app/</string>
+		<string>/Applications/Safari.app/</string>
+		<string>/Applications/Google Chrome.app/</string>
+		<string>/Applications/App Store.app/</string>
+		<string>/Applications/Utilities/Console.app/</string>
+		<string>/Applications/Utilities/Terminal.app/</string>
+		<string>/Applications/,--view grid --display stack --sort name</string>
+		<string>~/Downloads</string>
+	</array>
+	<key>LogPath</key>
+	<string>$HOME/Library/Logs/DockBuilder.log</string>
+</dict>
+</plist>

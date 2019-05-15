@@ -17,6 +17,7 @@ DockBuilder allows for the building of a user's Dock based on an organization's 
 ## Requirements for Building
 - [Platypus](https://sveinbjorn.org/platypus): A developer tool that creates native Mac applications from command line scripts such as shell scripts or Python, Perl, Ruby, Tcl, JavaScript and PHP programs.
     - You must install the command line tool associated with Platypus. Open Platypus, in the Menu Bar choose "Platypus" > "Preferences" and click the "Install" button to install the Platypus command line tool.
+- jamfHelper: jamfHelper is used to display the message when the Dock is being built (if you choose to use that feature). CocoaDialog could also be leveraged pretty easily for environments without Jamf Pro. AppleScript could also be used, but you can't create an AppleScript dialog void of buttons.
 
 *Note: [Dockutil](https://github.com/ryangball/DockBuilder#Dockutil) is also required, but included in the resulting .pkg and releases.*
 

@@ -5,6 +5,7 @@ DockBuilder allows for the building of a user's Dock based on an organization's 
 
 ## Features
 - Builds a Dock based on pre-defined defaults
+- Includes a framework for building unique Docks for certain users based on some criteria (including an example)
 - Logs to ~/Library/Logs/DockBuilder.log (by default)
 - Does not start until the Dock.app is loaded upon login
 - Only builds a Dock for user's who's Dock is younger than 300 seconds (to minimize re-building a pre-existing user's Dock after the installation of DockBuilder)
@@ -38,10 +39,11 @@ cd DockBuilder
 Within the [build.sh](/build.sh) script, you can modify the top-most variables to create a custom DockBuilder .app and .pkg.
 
 Some things to keep in mind:
-1. If you change the breadcrumb variable, you'll need to update that in the postinstall as the postinstall uses slightly different path structure within the for loop around line 25.
-2. Within both the breadcrumb and log variables, you'll notice the $HOME environmental variable. You should leave this in there as both should be in the user's home folder.
-3. Within the defaultItemsToAdd array, you need to follow the same pattern that I used in the example. When specifying view options for the persistent-others Dock items, you need to separate the Dock item and options with a comma (",") as per the example.
-4. After modifying the variables in build.sh, please test for full functionality before deploying.
+1. Within both the breadcrumb and log variables, you'll notice the $HOME environmental variable. You should leave this in there as both should be in the user's home folder.
+2. Within the defaultItemsToAdd array (and alternateItemsToAdd_1 if you use it), you need to follow the same pattern that I used in the example. When specifying view options for the persistent-others Dock items, you need to separate the Dock item and options with a comma (",") as per the example.
+3. After modifying the variables in build.sh, please test for full functionality before deploying.
+4. If you want to set up a unique Dock for certain users you must populate the alternateItemsToAdd_1 ion [build.sh](/build.sh) **and** modify [this logic in dockbuilder.sh]([/dockbuilder.sh](https://github.com/ryangball/DockBuilder/blob/024aa453ce729b786565b32ed559f3ca757fdfb9/dockbuilder.sh#L108-L119)) to include the users or criteria to build the alternate Dock.
+5. If you want to exclude specific existing users from the initial breadcrumb creation so that they will get a new Dock created, you must populate the skipInitialBreadcrumbUsers variable in [build.sh](/build.sh).
 
 ## Testing
 To test DockBuilder, install the .pkg, then unload/load/start the LaunchAgent.

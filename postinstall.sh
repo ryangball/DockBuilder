@@ -2,6 +2,7 @@
 #shellcheck disable=SC2012
 
 preferenceFileFullPath="/Library/Preferences/com.github.ryangball.dockbuilder.defaults.plist"
+breadcrumbPathMinusHome=$(/usr/libexec/PlistBuddy -c "Print BreadcrumbPath" $preferenceFileFullPath | cut -d/  -f2-)
 skipInitialBreadcrumbUsers=$(/usr/libexec/PlistBuddy -c "Print SkipInitialBreadcrumbUsers" $preferenceFileFullPath | sed -e 1d -e '$d' | sed 's/^ *//')
 
 log="/Library/Logs/DockBuilder_Install.log"
@@ -29,7 +30,7 @@ for userName in $(dscl . -list /Users uid | awk '$2 >= 100 && $0 !~ /^_/ { print
 		continue
 	fi
 	userHome=$(/usr/bin/dscl . read "/Users/$userName" NFSHomeDirectory | cut -c 19-)
-	breadcrumb="$userHome/Library/Preferences/com.github.ryangball.dockbuilder.breadcrumb.plist"
+	breadcrumb="$userHome/$breadcrumbPathMinusHome"
 
 	# Check to see if a breadcrumb is already created in the user's home folder
 	if [[ -f "$breadcrumb" ]]; then

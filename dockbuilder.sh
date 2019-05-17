@@ -3,7 +3,7 @@
 # These variables will be replaced with values from the build.sh script automagically
 preferenceFileFullPath="/Library/Preferences/com.github.ryangball.dockbuilder.defaults.plist"
 
-########### It is not necessary to edit beyond this poing, do at your own risk ###########
+########### It is not necessary to edit beyond this point, do at your own risk ###########
 # These variables are populated from the main preference file, created
 # with the build.sh script and deployed to clients using resulting .pkg
 breadcrumb=$(eval echo "$(/usr/libexec/PlistBuddy -c "Print :BreadcrumbPath" "$preferenceFileFullPath")")	# Using eval here to expand $HOME

@@ -1,6 +1,9 @@
 #!/bin/bash
 #shellcheck disable=SC2012
 
+preferenceFileFullPath="/Library/Preferences/com.github.ryangball.dockbuilder.defaults.plist"
+skipInitialBreadcrumbUsers=$(/usr/libexec/PlistBuddy -c "Print SkipInitialBreadcrumbUsers" $preferenceFileFullPath | sed -e 1d -e '$d' | sed 's/^ *//')
+
 log="/Library/Logs/DockBuilder_Install.log"
 
 function writelog () {
@@ -21,6 +24,10 @@ writelog "Looping through all users to ensure Dock will be configured correctly.
 
 # Run through all normal accounts
 for userName in $(dscl . -list /Users uid | awk '$2 >= 100 && $0 !~ /^_/ { print $1 }'); do
+	if [[ "$skipInitialBreadcrumbUsers" =~ $userName ]]; then
+		writelog "Initial breadcrumb creation for $userName is being skipped."
+		continue
+	fi
 	userHome=$(/usr/bin/dscl . read "/Users/$userName" NFSHomeDirectory | cut -c 19-)
 	breadcrumb="$userHome/Library/Preferences/com.github.ryangball.dockbuilder.breadcrumb.plist"
 

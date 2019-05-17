@@ -2,15 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AlternateItemsToAdd_1</key>
+	<array>
+		<string>/Applications/System Preferences.app/</string>
+		<string>/Applications/Safari.app/</string>
+		<string>/Applications/App Store.app/</string>
+		<string>/System/Library/CoreServices/Applications/Directory Utility.app/</string>
+		<string>/Applications/Utilities/Activity Monitor.app/</string>
+		<string>/Applications/Utilities/Console.app/</string>
+		<string>/Applications/Utilities/Terminal.app/</string>
+		<string>/System/Library/CoreServices/Applications/Network Utility.app/</string>
+		<string>/Applications/Utilities/Disk Utility.app/</string>
+		<string>/Applications/Utilities/Keychain Access.app/</string>
+		<string>/Applications/,--view grid --display stack --sort name</string>
+		<string>~/Downloads</string>
+	</array>
 	<key>AppIcon</key>
 	<string>/System/Library/CoreServices/Dock.app/Contents/Resources/Dock.icns</string>
 	<key>BreadcrumbPath</key>
 	<string>$HOME/Library/Preferences/com.github.ryangball.dockbuilder.breadcrumb.plist</string>
-	<key>HideDockMessage</key>
-	<string>Your Mac's Dock is being built for the first time.</string>
-	<key>HideDockWhileBuilding</key>
-	<true/>
-	<key>ItemsToAdd</key>
+	<key>DefaultItemsToAdd</key>
 	<array>
 		<string>/Applications/System Preferences.app/</string>
 		<string>/Applications/Self Service.app/</string>
@@ -22,7 +33,16 @@
 		<string>/Applications/,--view grid --display stack --sort name</string>
 		<string>~/Downloads</string>
 	</array>
+	<key>HideDockMessage</key>
+	<string>Your Mac's Dock is being built for the first time.</string>
+	<key>HideDockWhileBuilding</key>
+	<true/>
 	<key>LogPath</key>
 	<string>$HOME/Library/Logs/DockBuilder.log</string>
+	<key>SkipInitialBreadcrumbUsers</key>
+	<array>
+		<string>admin2</string>
+		<string>admin</string>
+	</array>
 </dict>
 </plist>

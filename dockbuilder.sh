@@ -11,18 +11,25 @@ log=$(eval echo "$(/usr/libexec/PlistBuddy -c "Print :LogPath" "$preferenceFileF
 appIcon=$(/usr/libexec/PlistBuddy -c "Print :AppIcon" "$preferenceFileFullPath")
 hideDockWhileBuilding=$(/usr/libexec/PlistBuddy -c "Print :HideDockWhileBuilding" "$preferenceFileFullPath")
 hideDockMessage=$(/usr/libexec/PlistBuddy -c "Print :HideDockMessage" "$preferenceFileFullPath")
-dockItemsFromPlist=$(/usr/libexec/PlistBuddy -c "Print ItemsToAdd:" "$preferenceFileFullPath" | grep '/' | sed 's/^ *//')
+defaultItemsToAddFromPlist=$(/usr/libexec/PlistBuddy -c "Print DefaultItemsToAdd:" "$preferenceFileFullPath" | grep '/' | sed 's/^ *//')
+alternateItemsToAdd_1FromPlist=$(/usr/libexec/PlistBuddy -c "Print AlternateItemsToAdd_1:" "$preferenceFileFullPath" | grep '/' | sed 's/^ *//')
+loggedInUser=$(/usr/bin/python -c 'from SystemConfiguration import SCDynamicStoreCopyConsoleUser; import sys; username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]; username = [username,""][username in [u"loginwindow", None, u""]]; sys.stdout.write(username + "\n");')
 scriptName=$(basename "$0")
 
 # Validate we got values from the plist
 if [[ -f "$preferenceFileFullPath" ]]; then
-	# Create array of all items we need to add
+	# Create array for default items
 	while read -r line; do
-		itemsToAdd+=("$line")
-	done <<< "$dockItemsFromPlist"
+		defaultItemsToAdd+=("$line")
+	done <<< "$defaultItemsToAddFromPlist"
+
+	# Create array for alternate_1 items
+	while read -r line; do
+		alternateItemsToAdd_1+=("$line")
+	done <<< "$alternateItemsToAdd_1FromPlist"
 
 	# Verify that we obtained values for each variable
-	if [[ -z "$breadcrumb" ]] || [[ -z "$log" ]] || [[ -z "$appIcon" ]] || [[ -z "$hideDockWhileBuilding" ]] || [[ -z "$hideDockMessage" ]] || [[ -z "${itemsToAdd[*]}" ]]; then
+	if [[ -z "$breadcrumb" ]] || [[ -z "$log" ]] || [[ -z "$appIcon" ]] || [[ -z "$hideDockWhileBuilding" ]] || [[ -z "$hideDockMessage" ]] || [[ -z "${defaultItemsToAdd[*]}" ]]; then
 		writelog "One or more default settings not present in main preference file; exiting."
 		finish 1
 	fi
@@ -43,7 +50,7 @@ function finish () {
     exit "$1"
 }
 
-function modify_dock () {
+function build_dock () {
 	for item in "${itemsToAdd[@]}"; do
 		if [[ "$item" =~ , ]]; then
 			params=${item##*,}
@@ -98,7 +105,19 @@ writelog "Clearing Dock."
 /bin/sleep 5
 
 # Set up the Dock
-modify_dock
+if [[ "$loggedInUser" == "admin" ]]; then
+	writelog "Building alternate_1 Dock."
+	for item in "${alternateItemsToAdd_1[@]}"; do
+		itemsToAdd+=("$item")
+	done
+	/usr/bin/defaults write "$HOME/Library/Preferences/com.apple.dock.plist" 'orientation' -string 'left' # Position the Dock to the left
+else
+	writelog "Building default Dock."
+	for item in "${defaultItemsToAdd[@]}"; do
+		itemsToAdd+=("$item")
+	done
+fi
+build_dock
 create_breadcrumb
 
 # Load the Dock if unloaded or restart the Dock

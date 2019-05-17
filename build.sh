@@ -27,7 +27,11 @@ hideDockWhileBuilding="true" # (true|false)
 # If the above variable is set to true, the message below will be displayed
 hideDockMessage="Your Mac's Dock is being built for the first time."
 
-# Array to hold all the items we need to add
+# Array of users where a breadcrumb will not be created during the postinstall
+# Handy if you want to force a new Dock for a user that might have existed already
+skipInitialBreadcrumbUsers=("admin" "admin2")
+
+# Array to hold all the items we need to add for a default Dock
 # Note: if you need to add options you must seperate the item from the options with a , (comma)
 # Example: "/Applications/,--view grid --display stack --sort name"
 # This will add the /Applications folder to the persistent-others section of the Dock and sets
@@ -45,7 +49,25 @@ defaultItemsToAdd=(
     "~/Downloads"
 )
 
-########### It is not necessary to edit beyond this poing, do at your own risk ###########
+# Array to hold all the items we need to add for an alternate Dock
+# Be sure to change the logic under the "Set up the Dock" comment in dockbuilder.sh if you want
+# to use this alternate Dock for a specific user/users
+alternateItemsToAdd_1=(
+    "/Applications/System Preferences.app/"
+	"/Applications/Safari.app/"
+	"/Applications/App Store.app/"
+	"/System/Library/CoreServices/Applications/Directory Utility.app/"
+	"/Applications/Utilities/Activity Monitor.app/"
+	"/Applications/Utilities/Console.app/"
+	"/Applications/Utilities/Terminal.app/"
+    "/System/Library/CoreServices/Applications/Network Utility.app/"
+	"/Applications/Utilities/Disk Utility.app/"
+	"/Applications/Utilities/Keychain Access.app/"
+	"/Applications/,--view grid --display stack --sort name"
+    "~/Downloads"
+)
+
+########### It is not necessary to edit beyond this point, do at your own risk ###########
 
 function install_dockutil_pkg () {
     if [[ -e /private/tmp/DockBuilder/files/usr/local/bin/dockutil ]]; then
@@ -79,7 +101,8 @@ fi
 
 # Update the variables in the dockbuilder.sh script
 # If you know of a more elegant/efficient way to do this please create a PR
-sed -i .old "s#preferenceFileFullPath=.*#preferenceFileFullPath=\"$preferenceFileFullPath\"#" "$PWD/dockbuilder.sh"
+sed -i '' "s#preferenceFileFullPath=.*#preferenceFileFullPath=\"$preferenceFileFullPath\"#" "$PWD/dockbuilder.sh"
+sed -i '' "s#preferenceFileFullPath=.*#preferenceFileFullPath=\"$preferenceFileFullPath\"#" "$PWD/postinstall.sh"
 
 # Create clean temp build directories
 find /private/tmp/DockBuilder -mindepth 1 -delete
@@ -106,7 +129,9 @@ preferenceFileName="${preferenceFileFullPath##*/}"
 if [[ -e "$PWD/$preferenceFileName" ]]; then
     /usr/libexec/PlistBuddy -c Clear "$PWD/$preferenceFileName"
 fi
-/usr/libexec/PlistBuddy -c "Add :ItemsToAdd array" "$PWD/$preferenceFileName"
+/usr/libexec/PlistBuddy -c "Add :DefaultItemsToAdd array" "$PWD/$preferenceFileName"
+/usr/libexec/PlistBuddy -c "Add :AlternateItemsToAdd_1 array" "$PWD/$preferenceFileName"
+/usr/libexec/PlistBuddy -c "Add :SkipInitialBreadcrumbUsers array" "$PWD/$preferenceFileName"
 
 # Populate our variables into the plist
 defaults write "$PWD/$preferenceFileName" BreadcrumbPath -string "$breadcrumb"
@@ -115,10 +140,23 @@ defaults write "$PWD/$preferenceFileName" AppIcon -string "$appIcon"
 defaults write "$PWD/$preferenceFileName" HideDockWhileBuilding -bool "$hideDockWhileBuilding"
 defaults write "$PWD/$preferenceFileName" HideDockMessage -string "$hideDockMessage"
 
-# Re-populate our ItemsToAdd array
+# Populate our DefaultItemsToAdd array
 index="0"
 for item in "${defaultItemsToAdd[@]}"; do
-    plutil -insert ItemsToAdd.$index -string "$item" "$PWD/$preferenceFileName"
+    plutil -insert DefaultItemsToAdd.$index -string "$item" "$PWD/$preferenceFileName"
+    ((index++))
+done
+
+# Populate our AlternateItemsToAdd_1 array
+index="0"
+for item in "${alternateItemsToAdd_1[@]}"; do
+    plutil -insert AlternateItemsToAdd_1.$index -string "$item" "$PWD/$preferenceFileName"
+    ((index++))
+done
+
+# Populate our SkipInitialBreadcrumbUsers array
+for user in "${skipInitialBreadcrumbUsers[@]}"; do
+    plutil -insert SkipInitialBreadcrumbUsers.0 -string "$user" "$PWD/$preferenceFileName"
     ((index++))
 done
 

@@ -42,7 +42,7 @@ Some things to keep in mind:
 1. Within both the breadcrumb and log variables, you'll notice the $HOME environmental variable. You should leave this in there as both should be in the user's home folder.
 2. Within the defaultItemsToAdd array (and alternateItemsToAdd_1 if you use it), you need to follow the same pattern that I used in the example. When specifying view options for the persistent-others Dock items, you need to separate the Dock item and options with a comma (",") as per the example.
 3. After modifying the variables in build.sh, please test for full functionality before deploying.
-4. If you want to set up a unique Dock for certain users you must populate the alternateItemsToAdd_1 ion [build.sh](/build.sh) **and** modify [this logic in dockbuilder.sh]([/dockbuilder.sh](https://github.com/ryangball/DockBuilder/blob/024aa453ce729b786565b32ed559f3ca757fdfb9/dockbuilder.sh#L108-L119)) to include the users or criteria to build the alternate Dock.
+4. If you want to set up a unique Dock for certain users you must populate the alternateItemsToAdd_1 ion [build.sh](/build.sh) **and** modify [this logic in dockbuilder.sh](https://github.com/ryangball/DockBuilder/blob/e6c4bab519648bdcdc812293bdd0ad098a798cc9/dockbuilder.sh#L108-L119)) to include the users or criteria to build the alternate Dock.
 5. If you want to exclude specific existing users from the initial breadcrumb creation so that they will get a new Dock created, you must populate the skipInitialBreadcrumbUsers variable in [build.sh](/build.sh).
 
 ## Testing

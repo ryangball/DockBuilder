@@ -13,7 +13,7 @@ hideDockWhileBuilding=$(/usr/libexec/PlistBuddy -c "Print :HideDockWhileBuilding
 hideDockMessage=$(/usr/libexec/PlistBuddy -c "Print :HideDockMessage" "$preferenceFileFullPath")
 defaultItemsToAddFromPlist=$(/usr/libexec/PlistBuddy -c "Print DefaultItemsToAdd:" "$preferenceFileFullPath" | grep '/' | sed 's/^ *//')
 alternateItemsToAdd_1FromPlist=$(/usr/libexec/PlistBuddy -c "Print AlternateItemsToAdd_1:" "$preferenceFileFullPath" | grep '/' | sed 's/^ *//')
-loggedInUser=$(/usr/bin/python -c 'from SystemConfiguration import SCDynamicStoreCopyConsoleUser; import sys; username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]; username = [username,""][username in [u"loginwindow", None, u""]]; sys.stdout.write(username + "\n");')
+loggedInUser=$(/usr/sbin/scutil <<< "show State:/Users/ConsoleUser" | /usr/bin/awk '/Name :/ && ! /loginwindow/ { print $3 }')
 scriptName=$(basename "$0")
 
 # Validate we got values from the plist

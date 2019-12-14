@@ -75,7 +75,7 @@ function install_dockutil_pkg () {
     else
         pkgutil --expand-full "$PWD/dockutil.pkg" /private/tmp/DockBuilder/temp
         cp -R /private/tmp/DockBuilder/temp/Payload/usr /private/tmp/DockBuilder/files/
-        rm -R /private/tmp/DOckBuilder/temp
+        rm -R /private/tmp/DockBuilder/temp
     fi
 
     if [[ ! -e /private/tmp/DockBuilder/files/usr/local/bin/dockutil ]]; then
@@ -134,11 +134,11 @@ fi
 /usr/libexec/PlistBuddy -c "Add :SkipInitialBreadcrumbUsers array" "$PWD/$preferenceFileName"
 
 # Populate our variables into the plist
-defaults write "$PWD/$preferenceFileName" BreadcrumbPath -string "$breadcrumb"
-defaults write "$PWD/$preferenceFileName" LogPath -string "$log"
-defaults write "$PWD/$preferenceFileName" AppIcon -string "$appIcon"
-defaults write "$PWD/$preferenceFileName" HideDockWhileBuilding -bool "$hideDockWhileBuilding"
-defaults write "$PWD/$preferenceFileName" HideDockMessage -string "$hideDockMessage"
+/usr/bin/plutil -insert BreadcrumbPath -string "$breadcrumb" "$PWD/$preferenceFileName"
+/usr/bin/plutil -insert LogPath -string "$log" "$PWD/$preferenceFileName"
+/usr/bin/plutil -insert AppIcon -string "$appIcon" "$PWD/$preferenceFileName"
+/usr/bin/plutil -insert HideDockWhileBuilding -bool "$hideDockWhileBuilding" "$PWD/$preferenceFileName"
+/usr/bin/plutil -insert HideDockMessage -string "$hideDockMessage" "$PWD/$preferenceFileName"
 
 # Populate our DefaultItemsToAdd array
 index="0"

@@ -16,28 +16,6 @@ alternateItemsToAdd_1FromPlist=$(/usr/libexec/PlistBuddy -c "Print AlternateItem
 loggedInUser=$(/usr/sbin/scutil <<< "show State:/Users/ConsoleUser" | /usr/bin/awk '/Name :/ && ! /loginwindow/ { print $3 }')
 scriptName=$(basename "$0")
 
-# Validate we got values from the plist
-if [[ -f "$preferenceFileFullPath" ]]; then
-	# Create array for default items
-	while read -r line; do
-		defaultItemsToAdd+=("$line")
-	done <<< "$defaultItemsToAddFromPlist"
-
-	# Create array for alternate_1 items
-	while read -r line; do
-		alternateItemsToAdd_1+=("$line")
-	done <<< "$alternateItemsToAdd_1FromPlist"
-
-	# Verify that we obtained values for each variable
-	if [[ -z "$breadcrumb" ]] || [[ -z "$log" ]] || [[ -z "$appIcon" ]] || [[ -z "$hideDockWhileBuilding" ]] || [[ -z "$hideDockMessage" ]] || [[ -z "${defaultItemsToAdd[*]}" ]]; then
-		writelog "One or more default settings not present in main preference file; exiting."
-		finish 1
-	fi
-else
-	writelog "Preference file does not exist; exiting."
-	finish 1
-fi
-
 function writelog () {
     DATE=$(date +%Y-%m-%d\ %H:%M:%S)
     /bin/echo "${1}"
@@ -70,13 +48,37 @@ function create_breadcrumb () {
 	/usr/bin/defaults write "$breadcrumb" build-time "$(date +%r)"
 }
 
+trap finish EXIT
+
 writelog " "
 writelog "======== Starting $scriptName ========"
+
+# Validate we got values from the plist
+if [[ -f "$preferenceFileFullPath" ]]; then
+	# Create array for default items
+	while read -r line; do
+		defaultItemsToAdd+=("$line")
+	done <<< "$defaultItemsToAddFromPlist"
+
+	# Create array for alternate_1 items
+	while read -r line; do
+		alternateItemsToAdd_1+=("$line")
+	done <<< "$alternateItemsToAdd_1FromPlist"
+
+	# Verify that we obtained values for each variable
+	if [[ -z "$breadcrumb" ]] || [[ -z "$log" ]] || [[ -z "$appIcon" ]] || [[ -z "$hideDockWhileBuilding" ]] || [[ -z "$hideDockMessage" ]] || [[ -z "${defaultItemsToAdd[*]}" ]]; then
+		writelog "One or more default settings not present in main preference file; exiting."
+		exit 1
+	fi
+else
+	writelog "Preference file does not exist; exiting."
+	exit 1
+fi
 
 # Make sure DockUtil is installed
 if [[ ! -f "/usr/local/bin/dockutil" ]]; then
 	writelog "DockUtil does not exist, exiting."
-	finish 1
+	exit 1
 fi
 
 # We need to wait for the Dock to actually start
@@ -87,7 +89,7 @@ done
 # Check to see if the Dock was previously set up for the user
 if [[ -f "$breadcrumb" ]]; then
 	writelog "DockBuilder ran previously on $(defaults read "$breadcrumb" build-date) at $(defaults read "$breadcrumb" build-time)."
-	finish 0
+	exit 0
 fi
 
 if [[ "$hideDockWhileBuilding" == "true" ]]; then
@@ -130,4 +132,4 @@ else
 	/usr/bin/killall Dock
 fi
 
-finish 0
+exit 0

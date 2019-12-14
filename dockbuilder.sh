@@ -25,7 +25,6 @@ function writelog () {
 function finish () {
 	kill "$jamfHelperPID" 2>/dev/null; wait "$jamfHelperPID" 2>/dev/null
     writelog "======== Finished $scriptName ========"
-    exit "$1"
 }
 
 function build_dock () {

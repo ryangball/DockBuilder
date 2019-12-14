@@ -1,2 +1,3 @@
 build/*
-dockbuilder.sh.old.DS_Store
+dockbuilder.sh.old
+.DS_Store
